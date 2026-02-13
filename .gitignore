@@ -72,3 +72,5 @@ pnpm-lock.yaml
 *.tgz
 *.pid
 *.seed
+
+*.db
