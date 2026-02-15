@@ -4,7 +4,7 @@ import { Arg, Query, Resolver } from 'type-graphql';
 
 @Resolver()
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  private readonly userService = new UserService();
 
   @Query(() => UserModel)
   async getUser(@Arg('id', () => String) id: string): Promise<UserModel> {

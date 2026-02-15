@@ -5,7 +5,7 @@ import { Arg, Mutation, Resolver } from 'type-graphql';
 
 @Resolver()
 export class AuthResolver {
-  constructor(private authService: AuthService) {}
+  private authService = new AuthService();
 
   @Mutation(() => RegisterOutput)
   async register(@Arg('data', () => RegisterInput) data: RegisterInput): Promise<RegisterOutput> {
