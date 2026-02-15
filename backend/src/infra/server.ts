@@ -5,12 +5,13 @@ import { expressMiddleware } from '@as-integrations/express5';
 import express from 'express';
 import { buildSchema } from 'type-graphql';
 import { AuthResolver } from '@/resolvers/auth.resolver';
+import { UserResolver } from '@/resolvers/user.resolver';
 
 async function bootstrap() {
   const app = express();
 
   const schema = await buildSchema({
-    resolvers: [HelloResolver, AuthResolver],
+    resolvers: [HelloResolver, AuthResolver, UserResolver],
     validate: false,
     emitSchemaFile: './schema.graphql',
   });
