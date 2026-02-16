@@ -24,7 +24,7 @@ type LoginMutationData = {
 interface AuthState {
   user: User | null;
   token: string | null;
-  isAuhenticated: boolean;
+  isAuthenticated: boolean;
   login: (data: LoginInput) => Promise<boolean>;
   signup: (data: RegisterInput) => Promise<boolean>;
 }
@@ -34,7 +34,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       token: null,
-      isAuhenticated: false,
+      isAuthenticated: false,
       login: async (value: LoginInput) => {
         try {
           const { data } = await apolloClient.mutate<LoginMutationData>({
@@ -59,7 +59,7 @@ export const useAuthStore = create<AuthState>()(
                 updatedAt: user.updatedAt,
               },
               token: token,
-              isAuhenticated: true,
+              isAuthenticated: true,
             });
 
             return true;
@@ -97,7 +97,7 @@ export const useAuthStore = create<AuthState>()(
                 updatedAt: user.updatedAt,
               },
               token: token,
-              isAuhenticated: true,
+              isAuthenticated: true,
             });
 
             return true;
