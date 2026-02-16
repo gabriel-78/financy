@@ -1,9 +1,7 @@
-import { Layout } from "@/components/Layout";
-
 export function Singup() {
   return (
-    <Layout>
+    <div>
       <span>Singup</span>
-    </Layout>
+    </div>
   );
 }

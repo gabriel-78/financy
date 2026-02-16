@@ -1,9 +1,7 @@
-import { Layout } from "@/components/Layout";
-
 export function Login() {
   return (
-    <Layout>
+    <div>
       <span>Login</span>
-    </Layout>
+    </div>
   );
 }

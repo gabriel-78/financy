@@ -6,8 +6,8 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <main className="mx-auto px-16 py-4">{children}</main>
+    <div className="min-h-screen overflow-hidden bg-gray-100">
+      <main className="">{children}</main>
       <Toaster />
     </div>
   );
