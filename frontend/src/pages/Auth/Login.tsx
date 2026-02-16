@@ -7,13 +7,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Label } from "@/components/ui/label";
-import { UserRoundPlus } from "lucide-react";
+import { Lock, Mail, UserRoundPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Field, FieldLabel } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 
 const loginSchema = z.object({
   email: z.email(),
@@ -35,7 +39,12 @@ export function Login() {
 
   return (
     <div className="flex size-full overflow-hidden items-center justify-center">
-      <div className="flex flex-col justify-center items-center gap-8 max-w-[28rem] w-full">
+      <div
+        className="flex flex-col justify-center items-center gap-8 max-w-[28rem] w-full"
+        onClick={() => {
+          console.log(import.meta.env.VITE_BACKEND_URL);
+        }}
+      >
         <figure>
           <img src={logo} alt="Logo" />
         </figure>
@@ -53,29 +62,41 @@ export function Login() {
               className="flex gap-6 flex-col"
             >
               <div className="flex w-full flex-col gap-4">
-                <div className="flex flex-col w-full gap-2">
-                  <Label htmlFor="email">Email</Label>
+                <Field className="flex flex-col w-full gap-2">
+                  <FieldLabel htmlFor="inline-start-input">Email</FieldLabel>
 
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    {...form.register("email")}
-                    required
-                  />
-                </div>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="inline-start-input"
+                      type="email"
+                      placeholder="mail@exemplo.com"
+                      {...form.register("email")}
+                      required
+                    />
 
-                <div className="flex flex-col w-full gap-2">
-                  <Label htmlFor="email">Senha</Label>
+                    <InputGroupAddon align="inline-start">
+                      <Mail className="text-muted-foreground" />
+                    </InputGroupAddon>
+                  </InputGroup>
+                </Field>
 
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="********"
-                    {...form.register("password")}
-                    required
-                  />
-                </div>
+                <Field className="flex flex-col w-full gap-2">
+                  <FieldLabel htmlFor="inline-start-input">Senha</FieldLabel>
+
+                  <InputGroup>
+                    <InputGroupInput
+                      id="inline-start-input"
+                      type="password"
+                      placeholder="Digite sua senha"
+                      {...form.register("password")}
+                      required
+                    />
+
+                    <InputGroupAddon align="inline-start">
+                      <Lock className="text-muted-foreground" />
+                    </InputGroupAddon>
+                  </InputGroup>
+                </Field>
               </div>
 
               <Button
