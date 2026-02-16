@@ -27,10 +27,10 @@ const registerSchema = z.object({
   password: z.string().min(1, "Senha é obrigatória"),
 });
 
-type LoginFormData = z.infer<typeof registerSchema>;
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function Singup() {
-  const form = useForm<LoginFormData>({
+  const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
@@ -38,7 +38,7 @@ export function Singup() {
 
   const navigate = useNavigate();
 
-  const onSubmit = async (formData: LoginFormData) => {
+  const onSubmit = async (formData: RegisterFormData) => {
     try {
       const signupMutate = await signup({
         name: formData.name,
@@ -63,14 +63,7 @@ export function Singup() {
 
         <Card className="flex flex-col w-full rounded-xl">
           <CardHeader className="flex shrink-0 items-center">
-            <CardTitle
-              className="text-2xl font-bold"
-              onClick={() => {
-                console.log(form.getValues());
-              }}
-            >
-              Criar conta
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold">Criar conta</CardTitle>
 
             <CardDescription>
               Comece a controlar suas finanças ainda hoje

@@ -18,6 +18,8 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useAuthStore } from "@/stores/auth";
+import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.email(),
@@ -33,18 +35,26 @@ export function Login() {
 
   const navigate = useNavigate();
 
-  const onSubmit = (formData: LoginFormData) => {
-    console.log(formData);
+  const login = useAuthStore((state) => state.login);
+
+  const onSubmit = async (formData: LoginFormData) => {
+    try {
+      const loginMutate = await login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (loginMutate) {
+        toast.success("Login realizado com sucesso!");
+      }
+    } catch (error: any) {
+      toast.error("Erro ao realizar o login");
+    }
   };
 
   return (
     <div className="flex size-full overflow-hidden items-center justify-center">
-      <div
-        className="flex flex-col justify-center items-center gap-8 max-w-[28rem] w-full"
-        onClick={() => {
-          console.log(import.meta.env.VITE_BACKEND_URL);
-        }}
-      >
+      <div className="flex flex-col justify-center items-center gap-8 max-w-[28rem] w-full">
         <figure>
           <img src={logo} alt="Logo" />
         </figure>
