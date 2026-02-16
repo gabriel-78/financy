@@ -55,7 +55,7 @@ export class AuthService {
   }
 
   generateTokens(user: User): { token: string; refreshToken: string; user: User } {
-    const token = signJwt({ id: user.id, email: user.email }, '15m');
+    const token = signJwt({ id: user.id, email: user.email }, '55m');
 
     const refreshToken = signJwt({ id: user.id, email: user.email }, '1d');
 

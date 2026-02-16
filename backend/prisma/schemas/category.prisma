@@ -1,0 +1,32 @@
+enum CategoryType {
+    WORK
+    TRANSPORT
+    HEALTH
+    SAVINGS
+    SHOPPING
+    ENTERTAINMENT
+    GROCERIES
+    FOOD
+    PET
+    HOUSING
+    GIFTS
+    FITNESS
+    EDUCATION
+    TRAVEL
+    BILLS
+    GENERAL_EXPENSES
+}
+
+model Category {
+    id          String       @id @default(uuid())
+    name        String
+    color       String?
+    description String?
+    type        CategoryType
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+    creatorId   String
+    user        User         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+    @@unique([name, creatorId])
+}
