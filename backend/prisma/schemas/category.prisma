@@ -28,5 +28,7 @@ model Category {
     creatorId   String
     user        User         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
+    transactions Transaction[]
+
     @@unique([name, creatorId])
 }
