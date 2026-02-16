@@ -18,24 +18,40 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useAuthStore } from "@/stores/auth";
+import { toast } from "sonner";
 
-const loginSchema = z.object({
+const registerSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.email(),
   password: z.string().min(1, "Senha é obrigatória"),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = z.infer<typeof registerSchema>;
 
 export function Singup() {
   const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
   });
+
+  const signup = useAuthStore((state) => state.signup);
 
   const navigate = useNavigate();
 
-  const onSubmit = (formData: LoginFormData) => {
-    console.log(formData);
+  const onSubmit = async (formData: LoginFormData) => {
+    try {
+      const signupMutate = await signup({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (signupMutate) {
+        toast.success("Cadastro realizado com sucesso!");
+      }
+    } catch (error: any) {
+      toast.error("Erro ao realizar o cadastro");
+    }
   };
 
   return (
@@ -47,7 +63,14 @@ export function Singup() {
 
         <Card className="flex flex-col w-full rounded-xl">
           <CardHeader className="flex shrink-0 items-center">
-            <CardTitle className="text-2xl font-bold">Criar conta</CardTitle>
+            <CardTitle
+              className="text-2xl font-bold"
+              onClick={() => {
+                console.log(form.getValues());
+              }}
+            >
+              Criar conta
+            </CardTitle>
 
             <CardDescription>
               Comece a controlar suas finanças ainda hoje

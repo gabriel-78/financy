@@ -8,7 +8,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuhenticated: boolean;
-  singup: (data: RegisterInput) => Promise<void>;
+  signup: (data: RegisterInput) => Promise<boolean>;
 }
 
 type RegisterMutationData = {
@@ -25,14 +25,16 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuhenticated: false,
-      singup: async (value: RegisterInput) => {
+      signup: async (value: RegisterInput) => {
         try {
           const { data } = await apolloClient.mutate<RegisterMutationData>({
             mutation: REGISTER,
             variables: {
-              name: value.name,
-              email: value.email,
-              password: value.password,
+              data: {
+                name: value.name,
+                email: value.email,
+                password: value.password,
+              },
             },
           });
 
@@ -50,7 +52,11 @@ export const useAuthStore = create<AuthState>()(
               token: token,
               isAuhenticated: true,
             });
+
+            return true;
           }
+
+          return false;
         } catch (error) {
           console.log("Erro ao fazer o cadastro");
 
