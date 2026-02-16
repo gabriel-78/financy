@@ -1,3 +1,5 @@
+import { AppLayout } from "@/components/Layouts/AppLayout";
+import { AuthLayout } from "@/components/Layouts/AuthLayout";
 import { Login } from "@/pages/Auth/Login";
 import { Singup } from "@/pages/Auth/Singup";
 import { Categories } from "@/pages/Categories";
@@ -10,17 +12,21 @@ function RoutesComponent() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboards />} />
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<Login />} />
 
-        <Route path="/login" element={<Login />} />
+          <Route path="/singup" element={<Singup />} />
+        </Route>
 
-        <Route path="/singup" element={<Singup />} />
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Dashboards />} />
 
-        <Route path="/transactions" element={<Transaction />} />
+          <Route path="/transactions" element={<Transaction />} />
 
-        <Route path="/categories" element={<Categories />} />
+          <Route path="/categories" element={<Categories />} />
 
-        <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
       </Routes>
     </Router>
   );
