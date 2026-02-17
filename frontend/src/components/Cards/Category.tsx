@@ -16,8 +16,7 @@ import { DELETE_CATEGORY } from "@/lib/graphql/mutations/category";
 
 interface CategoryCardProps {
   category: Category;
-  onDelete: (value: Category) => void;
-  onEdit: (value: Category) => void;
+  onSelected: (value: Category) => void;
 }
 
 export function CategoryCard({ ...props }: CategoryCardProps) {
@@ -54,7 +53,7 @@ export function CategoryCard({ ...props }: CategoryCardProps) {
             variant={"outline"}
             className=""
             disabled={loading}
-            onClick={() => props.onEdit(props.category)}
+            onClick={() => props.onSelected(props.category)}
           >
             <SquarePen />
           </Button>

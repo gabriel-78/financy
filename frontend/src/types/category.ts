@@ -38,6 +38,14 @@ export interface CreateCategoryInput {
   type: CategoryIconType;
 }
 
+export interface UpdateCategoryInput {
+  id: string;
+  color: string;
+  description?: string;
+  name: string;
+  type: CategoryIconType;
+}
+
 export interface Category {
   color: string;
   createdAt?: string;

@@ -1,6 +1,6 @@
 import { CategoryCard } from "@/components/Cards/Category";
 import { CategoryIcon } from "@/components/Category/Mark";
-import { CreateCategoryDialog } from "@/components/Dialogs/Category/Create";
+import { ManageCategoryDialog } from "@/components/Dialogs/Category/Manage";
 import { Button } from "@/components/ui/button";
 import {
   Item,
@@ -21,6 +21,9 @@ type ListCategoryQueryData = {
 
 export function Categories() {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [selectedCategory, setSelectedCategory] = useState<
+    Category | undefined
+  >(undefined);
 
   const { data, loading, refetch } =
     useQuery<ListCategoryQueryData>(LIST_CATEGORIES);
@@ -113,16 +116,19 @@ export function Categories() {
           <CategoryCard
             key={category.id}
             category={category}
-            onDelete={() => {}}
-            onEdit={() => {}}
+            onSelected={setSelectedCategory}
           />
         ))}
       </div>
 
-      <CreateCategoryDialog
-        open={openDialog}
-        onOpenChange={setOpenDialog}
+      <ManageCategoryDialog
+        open={openDialog || !!selectedCategory}
+        onOpenChange={(value) => {
+          setOpenDialog(value);
+          if (!value) setSelectedCategory(undefined);
+        }}
         onCreated={() => refetch()}
+        category={selectedCategory}
       />
     </div>
   );
