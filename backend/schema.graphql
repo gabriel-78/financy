@@ -5,6 +5,7 @@
 
 type CategoryModel {
   color: String
+  countTransactions: Float
   createdAt: DateTimeISO!
   creator: UserModel
   creatorId: String!

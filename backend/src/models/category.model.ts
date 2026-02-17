@@ -30,4 +30,7 @@ export class CategoryModel {
 
   @Field(() => UserModel, { nullable: true })
   creator?: UserModel;
+
+  @Field(() => Number, { nullable: true })
+  countTransactions?: number;
 }

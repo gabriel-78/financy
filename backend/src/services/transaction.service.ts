@@ -89,4 +89,12 @@ export class TransactionService {
       where: { id },
     });
   }
+
+  async countTransactions(categoryId: string) {
+    return prismaClient.transaction.count({
+      where: {
+        categoryId,
+      },
+    });
+  }
 }
