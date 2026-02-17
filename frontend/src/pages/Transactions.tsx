@@ -12,9 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DELETE_TRANSACTION } from "@/lib/graphql/mutations/transaction";
 import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/transaction";
 import type { Transaction } from "@/types/transaction";
-import { useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { Plus, SquarePen, Trash } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -27,6 +28,21 @@ export function Transaction() {
   const [selectedTransaction, setSelectedTransaction] = useState<
     Transaction | undefined
   >(undefined);
+
+  const [deleteTransaction, deleteTransactionMutation] = useMutation(
+    DELETE_TRANSACTION,
+    {
+      refetchQueries: [LIST_TRANSACTIONS],
+    },
+  );
+
+  const onDeleteTransaction = async (id: string) => {
+    await deleteTransaction({
+      variables: {
+        deleteTransactionId: id,
+      },
+    });
+  };
 
   const transactionsQuery = useQuery<ListCategoryQueryData>(LIST_TRANSACTIONS);
 
@@ -51,7 +67,7 @@ export function Transaction() {
       </div>
 
       <Table className="">
-        <TableHeader>
+        <TableHeader className="sticky bg-background top-0">
           <TableRow>
             <TableHead className="">Descrição</TableHead>
 
@@ -101,7 +117,7 @@ export function Transaction() {
                 <Button
                   variant={"outline"}
                   className=""
-                  // onClick={onDeleteCategory}
+                  onClick={() => onDeleteTransaction(transaction.id)}
                   // disabled={loading}
                 >
                   <Trash />
@@ -120,11 +136,13 @@ export function Transaction() {
           ))}
         </TableBody>
 
-        <TableFooter>
+        <TableFooter className="sticky bg-background bottom-0">
           <TableRow>
             <TableCell colSpan={3}>Total</TableCell>
 
-            <TableCell className="text-right">$2,500.00</TableCell>
+            <TableCell colSpan={3} className="text-right">
+              $2,500.00
+            </TableCell>
           </TableRow>
         </TableFooter>
       </Table>

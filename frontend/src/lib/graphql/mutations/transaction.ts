@@ -19,11 +19,11 @@ export const CREATE_TRANSACTION = gql`
   }
 `;
 
-// export const DELETE_CATEGORY = gql`
-//   mutation DeleteCategory($deleteCategoryId: String!) {
-//     deleteCategory(id: $deleteCategoryId)
-//   }
-// `;
+export const DELETE_TRANSACTION = gql`
+  mutation DeleteTransaction($deleteTransactionId: String!) {
+    deleteTransaction(id: $deleteTransactionId)
+  }
+`;
 
 export const UPDATE_TRANSACTION = gql`
   mutation UpdateTransaction(
