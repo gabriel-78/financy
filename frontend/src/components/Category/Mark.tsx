@@ -22,6 +22,25 @@ type CategoryIconProps = {
   mark: CategoryIconType;
 };
 
+export const CategoryIconLabels: Record<CategoryIconType, string> = {
+  [CategoryMark.WORK]: "Trabalho",
+  [CategoryMark.TRANSPORT]: "Transporte",
+  [CategoryMark.HEALTH]: "Saúde",
+  [CategoryMark.SAVINGS]: "Poupança",
+  [CategoryMark.SHOPPING]: "Compras",
+  [CategoryMark.ENTERTAINMENT]: "Entretenimento",
+  [CategoryMark.GROCERIES]: "Supermercado",
+  [CategoryMark.FOOD]: "Alimentação",
+  [CategoryMark.PET]: "Animal de estimação",
+  [CategoryMark.HOUSING]: "Moradia",
+  [CategoryMark.GIFTS]: "Presentes",
+  [CategoryMark.FITNESS]: "Academia",
+  [CategoryMark.EDUCATION]: "Educação",
+  [CategoryMark.TRAVEL]: "Viagem",
+  [CategoryMark.BILLS]: "Contas",
+  [CategoryMark.GENERAL_EXPENSES]: "Outros",
+} as const;
+
 export function CategoryIcon({ mark, ...props }: CategoryIconProps) {
   switch (mark) {
     case CategoryMark.WORK:

@@ -48,4 +48,5 @@ export interface Category {
   name: string;
   type: CategoryIconType;
   updatedAt?: string;
+  countTransactions?: number;
 }
