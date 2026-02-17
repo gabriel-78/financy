@@ -1,6 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 import tailwindcssAnimate from "tailwindcss-animate";
 
+function toRgba(cssVariable: string): string {
+  const color = `var(${cssVariable})`;
+  return ({ opacityValue }) => `rgba(${color}, ${opacityValue ?? 1.0})`;
+}
+
 export default {
   darkMode: ["class"],
   content: [
