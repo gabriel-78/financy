@@ -110,7 +110,12 @@ export function Categories() {
 
       <div className="grid w-full gap-4 grid-cols-[repeat(auto-fill,minmax(17.75rem,1fr))] p-px overflow-auto">
         {categories.map((category) => (
-          <CategoryCard key={category.id} category={category} />
+          <CategoryCard
+            key={category.id}
+            category={category}
+            onDelete={() => {}}
+            onEdit={() => {}}
+          />
         ))}
       </div>
 

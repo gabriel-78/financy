@@ -10,6 +10,9 @@ import {
 } from "../ui/card";
 import type { Category } from "@/types/category";
 import { CategoryIcon, CategoryIconLabels } from "../Category/Mark";
+import { useMutation } from "@apollo/client/react";
+import { LIST_CATEGORIES } from "@/lib/graphql/queries/category";
+import { DELETE_CATEGORY } from "@/lib/graphql/mutations/category";
 
 interface CategoryCardProps {
   category: Category;
@@ -18,6 +21,18 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ ...props }: CategoryCardProps) {
+  const [deleteCategoryMutation, { loading }] = useMutation(DELETE_CATEGORY, {
+    refetchQueries: [LIST_CATEGORIES],
+  });
+
+  const onDeleteCategory = async () => {
+    await deleteCategoryMutation({
+      variables: {
+        deleteCategoryId: props.category.id,
+      },
+    });
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="flex w-full justify-between flex-row">
@@ -29,7 +44,8 @@ export function CategoryCard({ ...props }: CategoryCardProps) {
           <Button
             variant={"outline"}
             className=""
-            onClick={() => props.onDelete(props.category)}
+            onClick={onDeleteCategory}
+            disabled={loading}
           >
             <Trash />
           </Button>
@@ -37,6 +53,7 @@ export function CategoryCard({ ...props }: CategoryCardProps) {
           <Button
             variant={"outline"}
             className=""
+            disabled={loading}
             onClick={() => props.onEdit(props.category)}
           >
             <SquarePen />
