@@ -3,8 +3,9 @@ import { useAuthStore } from "@/stores/auth";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import logo from "@/assets/Logo.svg";
+import type { PropsWithChildren } from "react";
 
-export function AppLayout() {
+export function AppLayout({ children }: PropsWithChildren) {
   const { isAuthenticated, user } = useAuthStore();
 
   const location = useLocation();
@@ -15,7 +16,7 @@ export function AppLayout() {
       ? "dashboard"
       : location.pathname.split("/").pop() || "home";
 
-  if (!isAuthenticated) return <Navigate to={"/login"} replace />;
+  if (!isAuthenticated) return <Navigate to={"/"} replace />;
 
   return (
     <div className="flex h-screen flex-col w-screen overflow-hidden bg-gray-100">
@@ -52,7 +53,7 @@ export function AppLayout() {
       </header>
 
       <main className="flex size-full overflow-hidden">
-        <Outlet />
+        {children ?? <Outlet />}
       </main>
 
       <Toaster />

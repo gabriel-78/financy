@@ -45,7 +45,7 @@ export function Profile() {
     resolver: zodResolver(updateUserSchema),
   });
 
-  const { signup, user, logout, updateUser: updateUserStore } = useAuthStore();
+  const { user, logout, updateUser: updateUserStore } = useAuthStore();
 
   const [updateUser, { loading }] = useMutation<
     UpdateUserMutationData,
