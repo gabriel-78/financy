@@ -6,126 +6,162 @@ import {
   DialogContent,
 } from "../../ui/dialog";
 import { Button } from "../../ui/button";
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { toast } from "sonner";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-  CategoryColor,
-  CategoryMark,
-  type Category,
-  type CategoryIconType,
-  type CreateCategoryInput,
-  type UpdateCategoryInput,
-} from "@/types/category";
-import { CategoryIcon } from "@/components/Category/Mark";
+
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useMemo } from "react";
 import {
-  CREATE_CATEGORY,
-  UPDATE_CATEGORY,
-} from "@/lib/graphql/mutations/category";
-import { useEffect } from "react";
+  TransactionType,
+  type CreateTransactionInput,
+  type Transaction,
+  type UpdateTransactionInput,
+} from "@/types/transaction";
+import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { currencyFormatter } from "@/utils/formatters/currency";
+import {
+  CREATE_TRANSACTION,
+  UPDATE_TRANSACTION,
+} from "@/lib/graphql/mutations/transaction";
+import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/transaction";
 import { LIST_CATEGORIES } from "@/lib/graphql/queries/category";
+import type { ListCategoryQueryData } from "@/pages/Categories";
 
 interface ManageTransactionDialogProps {
   open: boolean;
   onOpenChange: (oepn: boolean) => void;
   onCreated?: () => void;
-  transaction?: Category;
+  transaction?: Transaction;
 }
 
 const manageTransactionSchema = z.object({
-  title: z.string().min(1, "Título é obrigatório"),
-  description: z.string().optional(),
-  mark: z.enum(CategoryMark),
-  color: z.enum(CategoryColor),
+  description: z.string(),
+  type: z.enum(TransactionType),
+  date: z.date(),
+  amount: z.number(),
+  category: z.string(),
 });
 
 type ManageTransactionFormData = z.infer<typeof manageTransactionSchema>;
 
 type CreateTransactionMutationData = {
-  createCategory: Category;
+  createTransaction: Transaction;
 };
 
 type UpdateTransactionMutationData = {
-  updateCategory: Category;
+  updateTransaction: Transaction;
 };
 
 type CreateTransactionMutationVariables = {
-  data: CreateCategoryInput;
+  data: CreateTransactionInput;
 };
 
 type UpdateTransactionMutationVariables = {
-  updateCategoryId: string;
-  data: UpdateCategoryInput;
+  updateTransactionId: string;
+  data: UpdateTransactionInput;
 };
+
+const moneyFormatter = currencyFormatter();
 
 export function ManageTransactionDialog({
   open,
   onOpenChange,
   onCreated,
-  transaction: category,
+  transaction: transaction,
 }: ManageTransactionDialogProps) {
   const form = useForm<ManageTransactionFormData>({
     resolver: zodResolver(manageTransactionSchema),
   });
 
-  const [createCategory, createCategoryMutation] = useMutation<
+  const categoriesQuery = useQuery<ListCategoryQueryData>(LIST_CATEGORIES);
+
+  const categories = useMemo(
+    () => categoriesQuery.data?.getCategoriesByCreator ?? [],
+    [categoriesQuery.data],
+  );
+
+  const [createTransaction, createTransactionMutation] = useMutation<
     CreateTransactionMutationData,
     CreateTransactionMutationVariables
-  >(CREATE_CATEGORY, {
+  >(CREATE_TRANSACTION, {
+    refetchQueries: [LIST_TRANSACTIONS],
     onCompleted() {
-      toast.success("Categoria criada com sucesso");
+      toast.success("Transação criada com sucesso");
+
       onOpenChange(false);
+
       onCreated?.();
+
       form.reset();
     },
     onError() {
-      toast.error("Falha ao criar a categoria");
+      toast.error("Falha ao criar a transação");
     },
   });
 
-  const [updateCategory, updateCategoryMutation] = useMutation<
+  const [updateTransaction, updateTransactionMutation] = useMutation<
     UpdateTransactionMutationData,
     UpdateTransactionMutationVariables
-  >(UPDATE_CATEGORY, {
-    refetchQueries: [LIST_CATEGORIES],
+  >(UPDATE_TRANSACTION, {
+    refetchQueries: [LIST_TRANSACTIONS],
     onCompleted() {
-      toast.success("Categoria atualizada com sucesso");
+      toast.success("Transação atualizada com sucesso");
+
       onOpenChange(false);
+
       onCreated?.();
+
       form.reset();
     },
     onError() {
-      toast.error("Falha ao atualizar a categoria");
+      toast.error("Falha ao atualizar a transação");
     },
   });
 
   const onSubmit = async (formData: ManageTransactionFormData) => {
-    if (category) {
-      await updateCategory({
+    if (transaction) {
+      await updateTransaction({
         variables: {
-          updateCategoryId: category.id,
+          updateTransactionId: transaction.id,
           data: {
-            id: category.id,
-            color: formData.color,
+            id: transaction.id,
             description: formData.description,
-            name: formData.title,
-            type: formData.mark,
+            amount: formData.amount,
+            categoryId: formData.category,
+            date: formData.date.toISOString(),
+            type: formData.type,
           },
         },
       });
     } else {
-      await createCategory({
+      await createTransaction({
         variables: {
           data: {
-            color: formData.color,
             description: formData.description,
-            name: formData.title,
-            type: formData.mark,
+            amount: formData.amount,
+            categoryId: formData.category,
+            date: formData.date.toISOString(),
+            type: formData.type,
           },
         },
       });
@@ -133,12 +169,13 @@ export function ManageTransactionDialog({
   };
 
   useEffect(() => {
-    if (open && category) {
+    if (open && transaction) {
       form.reset({
-        title: category.name,
-        description: category.description,
-        color: category.color as keyof typeof CategoryColor,
-        mark: category.type as CategoryMark,
+        description: transaction.description,
+        amount: transaction.amount,
+        category: transaction.categoryId,
+        date: new Date(transaction.date),
+        type: transaction.type,
       });
     }
   }, [open]);
@@ -148,13 +185,13 @@ export function ManageTransactionDialog({
       <DialogContent className="max-w-[28rem] w-full">
         <DialogHeader className="space-y-2">
           <DialogTitle className="text-2xl font-bold leading-tight">
-            {category ? "Editar categoria" : "Nova categoria"}
+            {transaction ? "Editar transação" : "Nova transação"}
           </DialogTitle>
 
           <DialogDescription className="text-sm text-muted-foreground">
-            {category
-              ? "Ajuste a categoria"
-              : "Organize suas transações com categorias"}
+            {transaction
+              ? "Ajuste a sua despesa ou receita"
+              : "Registre sua despesa ou receita"}
           </DialogDescription>
         </DialogHeader>
 
@@ -164,23 +201,50 @@ export function ManageTransactionDialog({
           })}
           className="space-y-5 mt-6"
         >
-          <Field className="flex flex-col w-full gap-2">
-            <FieldLabel htmlFor="inline-start-input">Título</FieldLabel>
+          <Controller
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <Field>
+                <ToggleGroup
+                  type="single"
+                  value={field.value}
+                  onValueChange={(value) => field.onChange(value)}
+                  variant="outline"
+                  disabled={
+                    createTransactionMutation.loading ||
+                    updateTransactionMutation.loading
+                  }
+                  className="flex border border-solid border-gray-200 rounded-xl p-2"
+                >
+                  {Object.keys(TransactionType).map((key) => (
+                    <ToggleGroupItem
+                      key={key}
+                      value={key}
+                      aria-label="Light"
+                      className="flex [&>svg]:size-4 p-3 items-center justify-center rounded-[8px] w-full"
+                      disabled={
+                        createTransactionMutation.loading ||
+                        updateTransactionMutation.loading
+                      }
+                    >
+                      {key === TransactionType.EXPENSE ? (
+                        <ArrowUpCircle />
+                      ) : (
+                        <ArrowDownCircle />
+                      )}
 
-            <InputGroup>
-              <InputGroupInput
-                id="inline-start-input"
-                type="text"
-                placeholder="Ex. Alimentação"
-                {...form.register("title")}
-                required
-                disabled={
-                  createCategoryMutation.loading ||
-                  updateCategoryMutation.loading
-                }
-              />
-            </InputGroup>
-          </Field>
+                      <span>
+                        {key === TransactionType.EXPENSE
+                          ? "Receita"
+                          : "Despesa"}
+                      </span>
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </Field>
+            )}
+          />
 
           <Field className="flex flex-col w-full gap-2">
             <FieldLabel htmlFor="inline-start-input">Descrição</FieldLabel>
@@ -192,90 +256,112 @@ export function ManageTransactionDialog({
                 placeholder="Descrição da categoria"
                 {...form.register("description")}
                 disabled={
-                  createCategoryMutation.loading ||
-                  updateCategoryMutation.loading
+                  createTransactionMutation.loading ||
+                  updateTransactionMutation.loading
                 }
               />
             </InputGroup>
-
-            <FieldDescription>Opcional</FieldDescription>
           </Field>
 
-          <Controller
-            control={form.control}
-            name="mark"
-            render={({ field }) => (
-              <Field>
-                <FieldLabel>Ícone</FieldLabel>
+          <div className="flex w-full gap-4">
+            <Controller
+              control={form.control}
+              name="date"
+              render={({ field }) => {
+                return (
+                  <Field className="flex flex-col w-full gap-2">
+                    <FieldLabel htmlFor="date-picker-simple">Data</FieldLabel>
 
-                <ToggleGroup
-                  type="single"
-                  value={field.value}
-                  onValueChange={(value) => field.onChange(value)}
-                  variant="outline"
-                  disabled={
-                    createCategoryMutation.loading ||
-                    updateCategoryMutation.loading
-                  }
-                  className="flex flex-wrap gap-2"
-                >
-                  {Object.keys(CategoryMark).map((key) => (
-                    <ToggleGroupItem
-                      key={key}
-                      value={key}
-                      aria-label="Light"
-                      className="flex [&>svg]:size-5 p-2.5 flex-col items-center justify-center rounded-[8px] size-[2.625rem]"
-                      disabled={
-                        createCategoryMutation.loading ||
-                        updateCategoryMutation.loading
-                      }
-                    >
-                      <CategoryIcon mark={key as CategoryIconType} />
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </Field>
-            )}
-          />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          id="date-picker-simple"
+                          className="justify-start font-normal"
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Selecione</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
 
-          <Controller
-            control={form.control}
-            name="color"
-            render={({ field }) => (
-              <Field>
-                <FieldLabel>Cor</FieldLabel>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          defaultMonth={new Date()}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </Field>
+                );
+              }}
+            />
 
-                <ToggleGroup
-                  type="single"
-                  value={field.value}
-                  onValueChange={(value) => field.onChange(value)}
-                  variant="outline"
-                  disabled={
-                    createCategoryMutation.loading ||
-                    updateCategoryMutation.loading
-                  }
-                  className="flex flex-wrap gap-2"
-                >
-                  {Object.keys(CategoryColor).map((key) => (
-                    <ToggleGroupItem
-                      key={key}
-                      value={key}
-                      aria-label="Light"
-                      disabled={
-                        createCategoryMutation.loading ||
-                        updateCategoryMutation.loading
-                      }
-                      className="flex p-1 flex-col items-center justify-center rounded-[8px]"
-                    >
-                      <div
-                        className="h-5 min-w-10 w-full rounded"
-                        style={{ backgroundColor: key }}
+            <Controller
+              control={form.control}
+              name="amount"
+              render={({ field }) => {
+                return (
+                  <Field className="flex flex-col w-full gap-2">
+                    <FieldLabel htmlFor="inline-start-input">Valor</FieldLabel>
+
+                    <InputGroup>
+                      <InputGroupInput
+                        id="inline-start-input"
+                        type="text"
+                        placeholder="0,00"
+                        value={moneyFormatter.format(field.value)}
+                        onChange={(e) => {
+                          const adjustedvalue = moneyFormatter.parse(
+                            e.currentTarget.value,
+                          );
+
+                          field.onChange(Number(adjustedvalue));
+                        }}
+                        disabled={
+                          createTransactionMutation.loading ||
+                          updateTransactionMutation.loading
+                        }
                       />
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </Field>
-            )}
+                    </InputGroup>
+                  </Field>
+                );
+              }}
+            />
+          </div>
+
+          <Controller
+            control={form.control}
+            name="category"
+            render={({ field }) => {
+              return (
+                <Field className="flex flex-col w-full gap-2">
+                  <FieldLabel htmlFor="date-picker-simple">
+                    Categoria
+                  </FieldLabel>
+
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectGroup>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              );
+            }}
           />
 
           <div className="flex w-full justify-end gap-3 pt-2">
@@ -283,7 +369,8 @@ export function ManageTransactionDialog({
               type="submit"
               className="w-full"
               disabled={
-                createCategoryMutation.loading || updateCategoryMutation.loading
+                createTransactionMutation.loading ||
+                updateTransactionMutation.loading
               }
             >
               Salvar

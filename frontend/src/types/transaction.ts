@@ -5,20 +5,22 @@ export enum TransactionType {
   EXPENSE = "EXPENSE",
 }
 
-// export interface CreateCategoryInput {
-//   color: string;
-//   description?: string;
-//   name: string;
-//   type: CategoryIconType;
-// }
+export interface CreateTransactionInput {
+  amount: number;
+  date: string;
+  description: string;
+  type: TransactionType;
+  categoryId: string;
+}
 
-// export interface UpdateCategoryInput {
-//   id: string;
-//   color: string;
-//   description?: string;
-//   name: string;
-//   type: CategoryIconType;
-// }
+export interface UpdateTransactionInput {
+  id: string;
+  amount: number;
+  date: string;
+  description: string;
+  type: TransactionType;
+  categoryId: string;
+}
 
 export interface ListTransactionInput {
   description?: string;

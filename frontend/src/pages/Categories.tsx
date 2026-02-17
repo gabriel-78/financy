@@ -15,7 +15,7 @@ import { useQuery } from "@apollo/client/react";
 import { ArrowUpDown, Plus, Tag } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type ListCategoryQueryData = {
+export type ListCategoryQueryData = {
   getCategoriesByCreator: Category[];
 };
 
