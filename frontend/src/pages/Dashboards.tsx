@@ -11,6 +11,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { currencyFormatter } from "@/utils/formatters/currency";
+import { useQuery } from "@apollo/client/react";
 import {
   ArrowDownCircle,
   ArrowUpCircle,
@@ -18,11 +19,110 @@ import {
   Wallet,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/transaction";
+import type { ListTransactionQueryData } from "./Transactions";
+import { TransactionType, type Transaction } from "@/types/transaction";
+import { endOfMonth, isWithinInterval, startOfMonth } from "date-fns";
 
 const moneyFormatter = currencyFormatter();
 
+const start = startOfMonth(new Date());
+const end = endOfMonth(new Date());
+
+type CategorySummary = {
+  id: string;
+  name: string;
+  transactionsCount: number;
+  total: number;
+  color: string;
+};
+
+function summarizeByCategory(transactions: Transaction[]): CategorySummary[] {
+  const map = new Map<string, CategorySummary>();
+
+  for (const transaction of transactions) {
+    const category = transaction.category;
+    if (!category) continue;
+
+    const signedAmount =
+      transaction.type === TransactionType.INCOME
+        ? transaction.amount
+        : -transaction.amount;
+
+    const existing = map.get(category.id);
+
+    if (existing) {
+      existing.transactionsCount += 1;
+      existing.total += signedAmount;
+    } else {
+      map.set(category.id, {
+        id: category.id,
+        name: category.name,
+        transactionsCount: 1,
+        total: signedAmount,
+        color: category.color,
+      });
+    }
+  }
+
+  return Array.from(map.values());
+}
+
 export function Dashboards() {
   const navigate = useNavigate();
+
+  const transactionsQuery =
+    useQuery<ListTransactionQueryData>(LIST_TRANSACTIONS);
+
+  const transactions = useMemo(
+    () =>
+      transactionsQuery.data?.getTransactionsByUser
+        ? [...transactionsQuery.data.getTransactionsByUser].sort(
+            (left, right) =>
+              new Date(right.createdAt!).getTime() -
+              new Date(left.createdAt!).getTime(),
+          )
+        : [],
+    [transactionsQuery.data],
+  );
+
+  const userBudget = useMemo(() => {
+    return transactions.reduce(
+      (acc, { amount, type }) =>
+        type === TransactionType.INCOME ? acc + amount : acc - amount,
+      0,
+    );
+  }, [transactions]);
+
+  const thisMonthBudget = useMemo(() => {
+    return transactions
+      .filter(({ date }) =>
+        isWithinInterval(new Date(date), {
+          start,
+          end,
+        }),
+      )
+      .reduce(
+        (acc, { amount, type }) => {
+          return {
+            income:
+              type === TransactionType.INCOME
+                ? acc.income + amount
+                : acc.income,
+            expense:
+              type === TransactionType.EXPENSE
+                ? acc.expense + amount
+                : acc.expense,
+          };
+        },
+        { income: 0, expense: 0 },
+      );
+  }, [transactions]);
+
+  const groupedTransaction = useMemo(() => {
+    return summarizeByCategory(transactions);
+  }, [transactions]);
 
   return (
     <div className="grid grid-cols-6 p-12 gap-6 w-full overflow-hidden">
@@ -36,7 +136,7 @@ export function Dashboards() {
         </ItemHeader>
 
         <ItemContent>
-          <ItemTitle>{moneyFormatter.format(0)}</ItemTitle>
+          <ItemTitle>{`${userBudget >= 0 ? "" : "- "}${moneyFormatter.format(userBudget)}`}</ItemTitle>
         </ItemContent>
       </Item>
 
@@ -52,7 +152,7 @@ export function Dashboards() {
         </ItemHeader>
 
         <ItemContent>
-          <ItemTitle>{moneyFormatter.format(0)}</ItemTitle>
+          <ItemTitle>{moneyFormatter.format(thisMonthBudget.income)}</ItemTitle>
         </ItemContent>
       </Item>
 
@@ -68,12 +168,14 @@ export function Dashboards() {
         </ItemHeader>
 
         <ItemContent>
-          <ItemTitle>{moneyFormatter.format(0)}</ItemTitle>
+          <ItemTitle>
+            {moneyFormatter.format(thisMonthBudget.expense)}
+          </ItemTitle>
         </ItemContent>
       </Item>
 
       <div className="flex grow overflow-auto col-span-4 p-px">
-        <Card className="max-h-full h-fit overflow-auto">
+        <Card className="max-h-full h-fit overflow-auto w-full">
           <CardHeader className="flex flex-row items-center gap-4 border-b sticky bg-background border-solid border-b-gray-200 justify-between top-0">
             <CardTitle>Transações recentes</CardTitle>
 
@@ -84,40 +186,42 @@ export function Dashboards() {
           </CardHeader>
 
           <CardContent className="flex h-full flex-col gap-5 pt-6 overflow-auto">
-            {Array.from({ length: 53 }, (_, idx) => idx).map((x) => (
+            {transactions.map((transaction) => (
               <div
                 className="grid grid-cols-[1fr_minmax(8rem,10rem)_minmax(5rem,8rem)_] w-full min-h-fit overflow-hidden items-center justify-between gap-3"
-                key={x}
+                key={transaction.id}
               >
                 <div className="flex grow overflow-hidden items-center justify-start gap-4">
                   <CategoryTag
-                    color={"#f00f40"}
+                    color={transaction.category?.color ?? ""}
                     className="[&>svg]:size-4 p-3 rounded-[8px] shrink-0"
                   >
-                    <CategoryIcon mark={"GENERAL_EXPENSES"} />
+                    <CategoryIcon
+                      mark={transaction.category?.type ?? "GENERAL_EXPENSES"}
+                    />
                   </CategoryTag>
 
-                  <span className="truncate">
-                    teste Lorem ipsum dolor sit amet consectetur adipisicing
-                    elit. Quia fugiat voluptatum beatae exercitationem et rem ex
-                    eos possimus vero blanditiis assumenda harum, aspernatur
-                    consequatur, doloribus repudiandae natus minima libero
-                    labore.
-                  </span>
+                  <span className="truncate">{transaction.description}</span>
                 </div>
 
                 <div className="flex grow items-center justify-center">
-                  <CategoryTag color="#f000f0">
-                    <span className="truncate">{`x itens`}</span>
+                  <CategoryTag color={transaction.category?.color ?? ""}>
+                    <span className="truncate">
+                      {transaction.category?.name ?? ""}
+                    </span>
                   </CategoryTag>
                 </div>
 
-                <div className="flex grow items-center justify-end">
-                  <span className="truncate">{moneyFormatter.format(x)}</span>
+                <div className="flex grow items-center justify-end gap-2">
+                  <span className="truncate">
+                    {moneyFormatter.format(transaction.amount)}
+                  </span>
 
-                  <ArrowUpCircle className="text-brand-base" />
-
-                  <ArrowDownCircle className="text-red-base" />
+                  {transaction.type === TransactionType.INCOME ? (
+                    <ArrowUpCircle className="text-brand-base" />
+                  ) : (
+                    <ArrowDownCircle className="text-red-base" />
+                  )}
                 </div>
               </div>
             ))}
@@ -126,7 +230,7 @@ export function Dashboards() {
       </div>
 
       <div className="flex grow overflow-auto col-span-2 p-px">
-        <Card className="max-h-full h-fit overflow-auto">
+        <Card className="max-h-full h-fit overflow-auto w-full">
           <CardHeader className="flex flex-row items-center gap-4 border-b sticky bg-background border-solid border-b-gray-200 justify-between top-0">
             <CardTitle>Categorias</CardTitle>
 
@@ -137,25 +241,19 @@ export function Dashboards() {
           </CardHeader>
 
           <CardContent className="flex h-full flex-col gap-5 pt-6 overflow-auto">
-            {Array.from({ length: 53 }, (_, idx) => idx).map((x) => (
+            {groupedTransaction.map((category) => (
               <div
                 className="flex w-full min-h-fit overflow-hidden items-center justify-between gap-3"
-                key={x}
+                key={category.id}
               >
-                <CategoryTag color="#f000f0">
-                  <span className="truncate">
-                    teste Lorem ipsum dolor sit amet consectetur adipisicing
-                    elit. Quia fugiat voluptatum beatae exercitationem et rem ex
-                    eos possimus vero blanditiis assumenda harum, aspernatur
-                    consequatur, doloribus repudiandae natus minima libero
-                    labore.
-                  </span>
+                <CategoryTag color={category.color}>
+                  <span className="truncate">{category.name}</span>
                 </CategoryTag>
 
                 <div className="flex min-w-fit items-center justify-end gap-3 shrink-0">
-                  <span>{`x itens`}</span>
+                  <span>{`${category.transactionsCount} ${category.transactionsCount !== 1 ? "itens" : "item"}`}</span>
 
-                  <span>{moneyFormatter.format(x)}</span>
+                  <span>{moneyFormatter.format(category.total)}</span>
                 </div>
               </div>
             ))}

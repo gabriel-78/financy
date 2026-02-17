@@ -19,7 +19,7 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import { Plus, SquarePen, Trash } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type ListCategoryQueryData = {
+export type ListTransactionQueryData = {
   getTransactionsByUser: Transaction[];
 };
 
@@ -44,7 +44,8 @@ export function Transaction() {
     });
   };
 
-  const transactionsQuery = useQuery<ListCategoryQueryData>(LIST_TRANSACTIONS);
+  const transactionsQuery =
+    useQuery<ListTransactionQueryData>(LIST_TRANSACTIONS);
 
   const transactions = useMemo(
     () => transactionsQuery.data?.getTransactionsByUser ?? [],
