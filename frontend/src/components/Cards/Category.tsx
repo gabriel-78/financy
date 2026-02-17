@@ -9,10 +9,11 @@ import {
   CardTitle,
 } from "../ui/card";
 import type { Category } from "@/types/category";
-import { CategoryIcon, CategoryIconLabels } from "../Category/Mark";
+import { CategoryIcon } from "../Category/Mark";
 import { useMutation } from "@apollo/client/react";
 import { LIST_CATEGORIES } from "@/lib/graphql/queries/category";
 import { DELETE_CATEGORY } from "@/lib/graphql/mutations/category";
+import { CategoryTag } from "../Category/Tag";
 
 interface CategoryCardProps {
   category: Category;
@@ -36,7 +37,12 @@ export function CategoryCard({ ...props }: CategoryCardProps) {
     <Card className="w-full">
       <CardHeader className="flex w-full justify-between flex-row">
         <span className="size-10">
-          <CategoryIcon mark={props.category?.type ?? "GENERAL_EXPENSES"} />
+          <CategoryTag
+            color={props.category.color}
+            className="[&>svg]:size-4 p-3 rounded-[8px]"
+          >
+            <CategoryIcon mark={props.category?.type ?? "GENERAL_EXPENSES"} />
+          </CategoryTag>
         </span>
 
         <div className="flex gap-2 justify-end items-start shrink-0">
@@ -67,11 +73,11 @@ export function CategoryCard({ ...props }: CategoryCardProps) {
       </CardContent>
 
       <CardFooter className="justify-between gap-3 items-center">
-        <span>
-          {CategoryIconLabels[props.category?.type ?? "GENERAL_EXPENSES"]}
-        </span>
+        <CategoryTag color={props.category.color}>
+          {props.category.name ?? ""}
+        </CategoryTag>
 
-        <span>{`${props.category?.countTransactions ?? 0} ${props.category?.countTransactions !== 1 ? "itens" : "item"}`}</span>
+        <span className="whitespace-nowrap">{`${props.category?.countTransactions ?? 0} ${props.category?.countTransactions !== 1 ? "itens" : "item"}`}</span>
       </CardFooter>
     </Card>
   );

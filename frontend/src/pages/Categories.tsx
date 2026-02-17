@@ -95,7 +95,10 @@ export function Categories() {
         </Item>
 
         <Item variant="muted" className="w-full">
-          <ItemMedia variant="default">
+          <ItemMedia
+            variant="default"
+            style={{ color: mostUsedComumCategory?.color }}
+          >
             <CategoryIcon
               mark={mostUsedComumCategory?.type ?? "GENERAL_EXPENSES"}
             />
