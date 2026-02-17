@@ -74,6 +74,7 @@ type Mutation {
   register(data: RegisterInput!): RegisterOutput!
   updateCategory(data: UpdateCategoryInput!, id: String!): CategoryModel!
   updateTransaction(data: UpdateTransactionInput!, id: String!): TransactionModel!
+  updateUser(data: UpdateUserInput!, id: String!): UserModel!
 }
 
 type Query {
@@ -131,6 +132,12 @@ input UpdateTransactionInput {
   description: String!
   id: String!
   type: TransactionType!
+}
+
+input UpdateUserInput {
+  email: String!
+  id: String!
+  name: String!
 }
 
 type UserModel {
