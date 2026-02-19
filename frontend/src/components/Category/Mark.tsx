@@ -1,21 +1,22 @@
 import { CategoryMark, type CategoryIconType } from "@/types/category";
 import {
-  Briefcase,
-  Car,
   HeartPulse,
   PiggyBank,
   ShoppingCart,
-  Film,
-  ShoppingBasket,
   Utensils,
   PawPrint,
   Home,
   Gift,
   Dumbbell,
-  GraduationCap,
-  Plane,
-  Receipt,
   Wallet,
+  BriefcaseBusiness,
+  CarFront,
+  Ticket,
+  ToolCase,
+  BookOpen,
+  BaggageClaim,
+  Mailbox,
+  ReceiptText,
 } from "lucide-react";
 
 type CategoryIconProps = {
@@ -44,10 +45,10 @@ export const CategoryIconLabels: Record<CategoryIconType, string> = {
 export function CategoryIcon({ mark, ...props }: CategoryIconProps) {
   switch (mark) {
     case CategoryMark.WORK:
-      return <Briefcase {...props} />;
+      return <BriefcaseBusiness {...props} />;
 
     case CategoryMark.TRANSPORT:
-      return <Car {...props} />;
+      return <CarFront {...props} />;
 
     case CategoryMark.HEALTH:
       return <HeartPulse {...props} />;
@@ -59,10 +60,10 @@ export function CategoryIcon({ mark, ...props }: CategoryIconProps) {
       return <ShoppingCart {...props} />;
 
     case CategoryMark.ENTERTAINMENT:
-      return <Film {...props} />;
+      return <Ticket {...props} />;
 
     case CategoryMark.GROCERIES:
-      return <ShoppingBasket {...props} />;
+      return <ToolCase {...props} />;
 
     case CategoryMark.FOOD:
       return <Utensils {...props} />;
@@ -80,16 +81,16 @@ export function CategoryIcon({ mark, ...props }: CategoryIconProps) {
       return <Dumbbell {...props} />;
 
     case CategoryMark.EDUCATION:
-      return <GraduationCap {...props} />;
+      return <BookOpen {...props} />;
 
     case CategoryMark.TRAVEL:
-      return <Plane {...props} />;
+      return <BaggageClaim {...props} />;
 
     case CategoryMark.BILLS:
-      return <Receipt {...props} />;
+      return <Mailbox {...props} />;
 
     case CategoryMark.GENERAL_EXPENSES:
-      return <Wallet {...props} />;
+      return <ReceiptText {...props} />;
 
     default:
       return <Wallet {...props} />;
