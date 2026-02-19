@@ -182,13 +182,13 @@ export function ManageTransactionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[28rem] w-full">
-        <DialogHeader className="space-y-2">
-          <DialogTitle className="text-2xl font-bold leading-tight">
+      <DialogContent className="max-w-[28rem] w-full gap-6 rounded-xl">
+        <DialogHeader className="">
+          <DialogTitle className="text-gray-800 font-bold text-base text-left">
             {transaction ? "Editar transação" : "Nova transação"}
           </DialogTitle>
 
-          <DialogDescription className="text-sm text-muted-foreground">
+          <DialogDescription className="text-gray-600 text-sm text-left">
             {transaction
               ? "Ajuste a sua despesa ou receita"
               : "Registre sua despesa ou receita"}
@@ -199,13 +199,13 @@ export function ManageTransactionDialog({
           onSubmit={form.handleSubmit(onSubmit, (e) => {
             console.log(e);
           })}
-          className="space-y-5 mt-6"
+          className="gap-4 flex flex-col w-full"
         >
           <Controller
             control={form.control}
             name="type"
             render={({ field }) => (
-              <Field>
+              <Field className="pb-2">
                 <ToggleGroup
                   type="single"
                   value={field.value}
@@ -222,11 +222,12 @@ export function ManageTransactionDialog({
                       key={key}
                       value={key}
                       aria-label="Light"
-                      className="flex [&>svg]:size-4 p-3 items-center justify-center rounded-[8px] w-full"
+                      className="flex [&>svg]:size-4 p-3 items-center justify-center rounded-[8px] w-full data-[transaction=EXPENSE]:data-[state=on]:border-success data-[transaction=INCOME]:data-[state=on]:border-danger data-[state=on]:bg-gray-100 [&_svg]:data-[transaction=INCOME]:data-[state=on]:text-danger [&_svg]:data-[transaction=EXPENSE]:data-[state=on]:text-success data-[state=off]:border-transparent [&_svg]:data-[state=off]:text-gray-600 data-[state=off]:text-gray-600 data-[state=off]:font-normal shadow-none"
                       disabled={
                         createTransactionMutation.loading ||
                         updateTransactionMutation.loading
                       }
+                      data-transaction={key}
                     >
                       {key === TransactionType.EXPENSE ? (
                         <ArrowUpCircle />
@@ -253,7 +254,7 @@ export function ManageTransactionDialog({
               <InputGroupInput
                 id="inline-start-input"
                 type="text"
-                placeholder="Descrição da categoria"
+                placeholder="Ex. Almoço no restaurante"
                 {...form.register("description")}
                 disabled={
                   createTransactionMutation.loading ||
@@ -274,17 +275,20 @@ export function ManageTransactionDialog({
 
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          id="date-picker-simple"
-                          className="justify-start font-normal"
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Selecione</span>
-                          )}
-                        </Button>
+                        <InputGroup>
+                          <InputGroupInput
+                            id="date-picker-simple"
+                            type="text"
+                            placeholder="Selecione"
+                            value={
+                              field.value ? format(field.value, "PPP") : ""
+                            }
+                            disabled={
+                              createTransactionMutation.loading ||
+                              updateTransactionMutation.loading
+                            }
+                          />
+                        </InputGroup>
                       </PopoverTrigger>
 
                       <PopoverContent className="w-auto p-0" align="start">
@@ -313,7 +317,7 @@ export function ManageTransactionDialog({
                       <InputGroupInput
                         id="inline-start-input"
                         type="text"
-                        placeholder="0,00"
+                        placeholder={moneyFormatter.format(0)}
                         value={moneyFormatter.format(field.value)}
                         onChange={(e) => {
                           const adjustedvalue = moneyFormatter.parse(
@@ -364,10 +368,11 @@ export function ManageTransactionDialog({
             }}
           />
 
-          <div className="flex w-full justify-end gap-3 pt-2">
+          <div className="flex w-full pt-2">
             <Button
               type="submit"
               className="w-full"
+              size={"md"}
               disabled={
                 createTransactionMutation.loading ||
                 updateTransactionMutation.loading
