@@ -13,7 +13,7 @@ export function TransactionBadge({ type, className }: TransactionBadgeProps) {
       return (
         <div
           className={twMerge(
-            `inline-flex items-center gap-2 font-medium text-green-600 `,
+            `inline-flex text-sm items-center gap-2 font-medium text-green-600 `,
             className,
           )}
         >
@@ -27,7 +27,7 @@ export function TransactionBadge({ type, className }: TransactionBadgeProps) {
       return (
         <div
           className={twMerge(
-            `inline-flex items-center gap-2 font-medium text-red-600`,
+            `inline-flex items-center gap-2 font-medium text-red-600 text-sm`,
             className,
           )}
         >
