@@ -145,13 +145,13 @@ export function ManageCategoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[28rem] w-full">
-        <DialogHeader className="space-y-2">
-          <DialogTitle className="text-2xl font-bold leading-tight">
+      <DialogContent className="max-w-[28rem] w-full gap-6 rounded-xl">
+        <DialogHeader className="">
+          <DialogTitle className="text-gray-800 font-bold text-base text-left">
             {category ? "Editar categoria" : "Nova categoria"}
           </DialogTitle>
 
-          <DialogDescription className="text-sm text-muted-foreground">
+          <DialogDescription className="text-gray-600 text-sm text-left">
             {category
               ? "Ajuste a categoria"
               : "Organize suas transações com categorias"}
@@ -162,7 +162,7 @@ export function ManageCategoryDialog({
           onSubmit={form.handleSubmit(onSubmit, (e) => {
             console.log(e);
           })}
-          className="space-y-5 mt-6"
+          className="gap-4 flex flex-col w-full"
         >
           <Field className="flex flex-col w-full gap-2">
             <FieldLabel htmlFor="inline-start-input">Título</FieldLabel>
@@ -198,7 +198,9 @@ export function ManageCategoryDialog({
               />
             </InputGroup>
 
-            <FieldDescription>Opcional</FieldDescription>
+            <FieldDescription className="text-gray-500 text-xs">
+              Opcional
+            </FieldDescription>
           </Field>
 
           <Controller
@@ -282,6 +284,7 @@ export function ManageCategoryDialog({
             <Button
               type="submit"
               className="w-full"
+              size={"md"}
               disabled={
                 createCategoryMutation.loading || updateCategoryMutation.loading
               }
