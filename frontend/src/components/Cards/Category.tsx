@@ -14,6 +14,7 @@ import { useMutation } from "@apollo/client/react";
 import { LIST_CATEGORIES } from "@/lib/graphql/queries/category";
 import { DELETE_CATEGORY } from "@/lib/graphql/mutations/category";
 import { CategoryTag } from "../Category/Tag";
+import { IconButton } from "../ui/icon-button";
 
 interface CategoryCardProps {
   category: Category;
@@ -46,30 +47,33 @@ export function CategoryCard({ ...props }: CategoryCardProps) {
         </span>
 
         <div className="flex gap-2 justify-end items-start shrink-0">
-          <Button
-            variant={"outline"}
+          <IconButton
+            variant={"destructive"}
             className=""
             onClick={onDeleteCategory}
             disabled={loading}
           >
             <Trash />
-          </Button>
+          </IconButton>
 
-          <Button
-            variant={"outline"}
+          <IconButton
             className=""
             disabled={loading}
             onClick={() => props.onSelected(props.category)}
           >
             <SquarePen />
-          </Button>
+          </IconButton>
         </div>
       </CardHeader>
 
       <CardContent>
-        <CardTitle>{props.category?.name ?? ""}</CardTitle>
+        <CardTitle className="text-base text-gray-800 font-semibold">
+          {props.category?.name ?? ""}
+        </CardTitle>
 
-        <CardDescription>{props.category?.description ?? ""}</CardDescription>
+        <CardDescription className="text-gray-600 text-sm font-normal">
+          {props.category?.description ?? ""}
+        </CardDescription>
       </CardContent>
 
       <CardFooter className="justify-between gap-3 items-center">
@@ -77,7 +81,7 @@ export function CategoryCard({ ...props }: CategoryCardProps) {
           {props.category.name ?? ""}
         </CategoryTag>
 
-        <span className="whitespace-nowrap">{`${props.category?.countTransactions ?? 0} ${props.category?.countTransactions !== 1 ? "itens" : "item"}`}</span>
+        <span className="text-gray-600 text-sm whitespace-nowrap">{`${props.category?.countTransactions ?? 0} ${props.category?.countTransactions !== 1 ? "itens" : "item"}`}</span>
       </CardFooter>
     </Card>
   );

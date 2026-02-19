@@ -46,9 +46,13 @@ export function Categories() {
     <div className="flex flex-col p-12 gap-8 w-full">
       <div className="flex w-full ">
         <div className="flex w-full flex-col gap-0.5 justify-start">
-          <strong>Categorias</strong>
+          <strong className="text-gray-800 font-bold text-2xl">
+            Categorias
+          </strong>
 
-          <span>Organize suas transações por categorias</span>
+          <span className="text-gray-600 text-base">
+            Organize suas transações por categorias
+          </span>
         </div>
 
         <Button type="button" onClick={() => setOpenDialog(true)}>

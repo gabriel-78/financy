@@ -13,7 +13,7 @@ const iconButtonVariants = cva(
         destructive: "text-danger",
       },
       size: {
-        default: "min-h-8 min-w-8 max-h-8 max-w-8 h-9 px-4 py-2",
+        default: "min-h-8 min-w-8 max-h-8 max-w-8",
       },
     },
     defaultVariants: {
