@@ -14,7 +14,6 @@ export default {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
-
   theme: {
     container: {
       center: true,
@@ -23,8 +22,11 @@ export default {
         "2xl": "1400px",
       },
     },
-
     extend: {
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+      },
+      
       colors: {
         border: "var(--border)",
         input: "var(--input)",
