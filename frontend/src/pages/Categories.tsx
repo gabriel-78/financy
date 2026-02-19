@@ -64,13 +64,15 @@ export function Categories() {
       <div className="flex gap-6">
         <Item variant="muted" className="w-full">
           <ItemMedia variant="default">
-            <Tag />
+            <Tag className="size-6" />
           </ItemMedia>
 
           <ItemContent>
-            <ItemTitle>{Number(categories.length).toString()}</ItemTitle>
+            <ItemTitle className="text-gray-800 text-[1.75rem] font-bold leading-8">
+              {Number(categories.length).toString()}
+            </ItemTitle>
 
-            <ItemDescription className="uppercase">
+            <ItemDescription className="uppercase text-xs text-gray-500">
               total de categorias
             </ItemDescription>
           </ItemContent>
@@ -78,11 +80,11 @@ export function Categories() {
 
         <Item variant="muted" className="w-full">
           <ItemMedia variant="default">
-            <ArrowUpDown className="text-purple-base" />
+            <ArrowUpDown className="text-purple-base size-6 " />
           </ItemMedia>
 
           <ItemContent>
-            <ItemTitle>
+            <ItemTitle className="text-gray-800 text-[1.75rem] font-bold leading-8">
               {Number(
                 categories.reduce(
                   (acc, { countTransactions }) =>
@@ -92,7 +94,7 @@ export function Categories() {
               ).toString()}
             </ItemTitle>
 
-            <ItemDescription className="uppercase">
+            <ItemDescription className="uppercase text-xs text-gray-500">
               total de transações
             </ItemDescription>
           </ItemContent>
@@ -102,6 +104,7 @@ export function Categories() {
           <ItemMedia
             variant="default"
             style={{ color: mostUsedComumCategory?.color }}
+            className="[&_svg]:size-6"
           >
             <CategoryIcon
               mark={mostUsedComumCategory?.type ?? "GENERAL_EXPENSES"}
@@ -109,9 +112,11 @@ export function Categories() {
           </ItemMedia>
 
           <ItemContent>
-            <ItemTitle>{mostUsedComumCategory?.name ?? ""}</ItemTitle>
+            <ItemTitle className="text-gray-800 text-[1.75rem] font-bold leading-8">
+              {mostUsedComumCategory?.name ?? ""}
+            </ItemTitle>
 
-            <ItemDescription className="uppercase">
+            <ItemDescription className="uppercase text-xs text-gray-500">
               categoria mais utilizada
             </ItemDescription>
           </ItemContent>
