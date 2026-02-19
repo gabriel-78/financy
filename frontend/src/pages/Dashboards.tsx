@@ -125,7 +125,7 @@ export function Dashboards() {
   }, [transactions]);
 
   return (
-    <div className="grid grid-cols-6 p-12 gap-6 w-full overflow-hidden">
+    <div className="grid grid-cols-6 p-12 gap-6 w-full overflow-hidden auto-rows-min">
       <Item variant="muted" className="w-full col-span-2 gap-4">
         <ItemHeader className="gap-3 items-center justify-start">
           <ItemMedia variant="default">
@@ -185,7 +185,11 @@ export function Dashboards() {
               Transações recentes
             </CardTitle>
 
-            <Button type="button" onClick={() => navigate("/transactions")}>
+            <Button
+              variant={"link"}
+              type="button"
+              onClick={() => navigate("/transactions")}
+            >
               Ver todas
               <ChevronRight />
             </Button>
@@ -250,7 +254,11 @@ export function Dashboards() {
               Categorias
             </CardTitle>
 
-            <Button type="button" onClick={() => navigate("/categories")}>
+            <Button
+              type="button"
+              variant={"link"}
+              onClick={() => navigate("/categories")}
+            >
               Gerenciar
               <ChevronRight />
             </Button>

@@ -3,6 +3,7 @@ import { CategoryTag } from "@/components/Category/Tag";
 import { ManageTransactionDialog } from "@/components/Dialogs/Transaction/Manage";
 import { TransactionBadge } from "@/components/Transaction/Badge";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
 import {
   Table,
   TableBody,
@@ -15,13 +16,17 @@ import {
 import { DELETE_TRANSACTION } from "@/lib/graphql/mutations/transaction";
 import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/transaction";
 import type { Transaction } from "@/types/transaction";
+import { currencyFormatter } from "@/utils/formatters/currency";
 import { useMutation, useQuery } from "@apollo/client/react";
+import { format } from "date-fns";
 import { Plus, SquarePen, Trash } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export type ListTransactionQueryData = {
   getTransactionsByUser: Transaction[];
 };
+
+const moneyFormatter = currencyFormatter();
 
 export function Transaction() {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -56,9 +61,13 @@ export function Transaction() {
     <div className="flex flex-col p-12 gap-8 w-full">
       <div className="flex w-full ">
         <div className="flex w-full flex-col gap-0.5 justify-start">
-          <strong>Transações</strong>
+          <strong className="text-gray-800 font-bold text-2xl">
+            Transações
+          </strong>
 
-          <span>Gerencie todas as suas transações financeiras</span>
+          <span className="text-gray-600 text-base">
+            Gerencie todas as suas transações financeiras
+          </span>
         </div>
 
         <Button type="button" onClick={() => setOpenDialog(true)}>
@@ -70,74 +79,103 @@ export function Transaction() {
       <Table className="">
         <TableHeader className="sticky bg-background top-0">
           <TableRow>
-            <TableHead className="">Descrição</TableHead>
+            <TableHead className="uppercase text-xs tracking-[0.0375rem] text-gray-500 font-medium text-left">
+              Descrição
+            </TableHead>
 
-            <TableHead>Data</TableHead>
+            <TableHead className="uppercase text-xs tracking-[0.0375rem] text-gray-500 font-medium text-center">
+              Data
+            </TableHead>
 
-            <TableHead>Categoria</TableHead>
+            <TableHead className="uppercase text-xs tracking-[0.0375rem] text-gray-500 font-medium text-center">
+              Categoria
+            </TableHead>
 
-            <TableHead className="text-right">Tipo</TableHead>
+            <TableHead className="uppercase text-xs tracking-[0.0375rem] text-gray-500 font-medium text-center">
+              Tipo
+            </TableHead>
 
-            <TableHead className="text-right">Valor</TableHead>
+            <TableHead className="uppercase text-xs tracking-[0.0375rem] text-gray-500 font-medium text-right">
+              Valor
+            </TableHead>
 
-            <TableHead className="text-right">Ações</TableHead>
+            <TableHead className="uppercase text-xs tracking-[0.0375rem] text-gray-500 font-medium text-right">
+              Ações
+            </TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
           {transactions.map((transaction) => (
-            <TableRow key={transaction.id}>
+            <TableRow key={transaction.id} className="p-0">
               <TableCell className="font-medium">
-                <CategoryTag
-                  color={transaction?.category?.color ?? ""}
-                  className="[&>svg]:size-4 p-3 rounded-[8px]"
-                >
-                  <CategoryIcon
-                    mark={transaction?.category?.type ?? "GENERAL_EXPENSES"}
-                  />
-                </CategoryTag>
+                <div className="flex grow items-center justify-start gap-4">
+                  <CategoryTag
+                    color={transaction?.category?.color ?? ""}
+                    className="[&>svg]:size-4 p-3 rounded-[8px]"
+                  >
+                    <CategoryIcon
+                      mark={transaction?.category?.type ?? "GENERAL_EXPENSES"}
+                    />
+                  </CategoryTag>
 
-                <span>{transaction.description}</span>
+                  <span className="text-base text-gray-800 font-medium">
+                    {transaction.description}
+                  </span>
+                </div>
               </TableCell>
 
-              <TableCell>{transaction.date}</TableCell>
+              <TableCell className="text-center">
+                <span className="w-full text-sm text-gray-600 font-normal">
+                  {format(new Date(transaction.date), "dd/MM/yyyy")}
+                </span>
+              </TableCell>
 
-              <TableCell>
-                <CategoryTag color={transaction?.category?.color ?? ""}>
-                  {transaction.category?.name}
-                </CategoryTag>
+              <TableCell className="">
+                <div className="flex grow overflow-hidden items-center justify-center">
+                  <CategoryTag color={transaction?.category?.color ?? ""}>
+                    {transaction.category?.name}
+                  </CategoryTag>
+                </div>
               </TableCell>
 
               <TableCell className="text-right">
-                <TransactionBadge type={transaction.type} />
+                <div className="flex grow overflow-hidden items-center justify-center">
+                  <TransactionBadge type={transaction.type} />
+                </div>
               </TableCell>
 
-              <TableCell className="text-right">{transaction.amount}</TableCell>
+              <TableCell className="text-right">
+                <span className="text-sm text-gray-800 font-semibold">
+                  {`${transaction.amount > 0 ? "+" : "-"}${moneyFormatter.format(transaction.amount)}`}
+                </span>
+              </TableCell>
 
               <TableCell className="text-right">
-                <Button
-                  variant={"outline"}
-                  className=""
-                  onClick={() => onDeleteTransaction(transaction.id)}
-                  // disabled={loading}
-                >
-                  <Trash />
-                </Button>
+                <div className="flex grow items-center justify-end gap-2">
+                  <IconButton
+                    variant={"destructive"}
+                    className=""
+                    onClick={() => onDeleteTransaction(transaction.id)}
+                    // disabled={loading}
+                  >
+                    <Trash />
+                  </IconButton>
 
-                <Button
-                  variant={"outline"}
-                  className=""
-                  // disabled={loading}
-                  onClick={() => setSelectedTransaction(transaction)}
-                >
-                  <SquarePen />
-                </Button>
+                  <IconButton
+                    className=""
+                    // disabled={loading}
+                    onClick={() => setSelectedTransaction(transaction)}
+                  >
+                    <SquarePen />
+                  </IconButton>
+                </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
 
-        <TableFooter className="sticky bg-background bottom-0">
+        {/* <TableFooter className="sticky bg-background bottom-0">
           <TableRow>
             <TableCell colSpan={3}>Total</TableCell>
 
@@ -145,7 +183,7 @@ export function Transaction() {
               $2,500.00
             </TableCell>
           </TableRow>
-        </TableFooter>
+        </TableFooter> */}
       </Table>
 
       <ManageTransactionDialog
