@@ -125,7 +125,7 @@ export function Dashboards() {
   }, [transactions]);
 
   return (
-    <div className="grid grid-cols-6 p-12 gap-6 w-full overflow-hidden auto-rows-min">
+    <div className="grid grid-cols-6 p-12 gap-6 w-full overflow-hidden auto-rows-auto">
       <Item variant="muted" className="w-full col-span-2 gap-4">
         <ItemHeader className="gap-3 items-center justify-start">
           <ItemMedia variant="default">
