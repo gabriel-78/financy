@@ -1,7 +1,13 @@
 import { CategoryIcon } from "@/components/Category/Mark";
 import { CategoryTag } from "@/components/Category/Tag";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Item,
   ItemContent,
@@ -16,14 +22,16 @@ import {
   ArrowDownCircle,
   ArrowUpCircle,
   ChevronRight,
+  Plus,
   Wallet,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/transaction";
 import type { ListTransactionQueryData } from "./Transactions";
 import { TransactionType, type Transaction } from "@/types/transaction";
 import { endOfMonth, format, isWithinInterval, startOfMonth } from "date-fns";
+import { ManageTransactionDialog } from "@/components/Dialogs/Transaction/Manage";
 
 const moneyFormatter = currencyFormatter();
 
@@ -70,6 +78,11 @@ function summarizeByCategory(transactions: Transaction[]): CategorySummary[] {
 }
 
 export function Dashboards() {
+  const [
+    isVisibleManageTransactionDialog,
+    setIsVisibleManageTransactionDialog,
+  ] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
   const transactionsQuery =
@@ -244,6 +257,17 @@ export function Dashboards() {
               </div>
             ))}
           </CardContent>
+
+          <CardFooter className="flex w-full items-center justify-center sticky bottom-0 bg-background py-5 px-6 border-t border-solid border-t-gray-200">
+            <Button
+              variant={"link"}
+              type="button"
+              onClick={() => setIsVisibleManageTransactionDialog(true)}
+            >
+              <Plus />
+              Ver todas as transações
+            </Button>
+          </CardFooter>
         </Card>
       </div>
 
@@ -286,6 +310,11 @@ export function Dashboards() {
           </CardContent>
         </Card>
       </div>
+
+      <ManageTransactionDialog
+        open={isVisibleManageTransactionDialog}
+        onOpenChange={setIsVisibleManageTransactionDialog}
+      />
     </div>
   );
 }
