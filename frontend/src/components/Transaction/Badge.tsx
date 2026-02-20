@@ -9,7 +9,7 @@ type TransactionBadgeProps = {
 
 export function TransactionBadge({ type, className }: TransactionBadgeProps) {
   switch (type) {
-    case TransactionType.INCOME:
+    case TransactionType.EXPENSE:
       return (
         <div
           className={twMerge(
@@ -23,7 +23,7 @@ export function TransactionBadge({ type, className }: TransactionBadgeProps) {
         </div>
       );
 
-    case TransactionType.EXPENSE:
+    case TransactionType.INCOME:
       return (
         <div
           className={twMerge(

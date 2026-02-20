@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { DELETE_TRANSACTION } from "@/lib/graphql/mutations/transaction";
 import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/transaction";
-import type { Transaction } from "@/types/transaction";
+import { TransactionType, type Transaction } from "@/types/transaction";
 import { currencyFormatter } from "@/utils/formatters/currency";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { format } from "date-fns";
@@ -147,7 +147,7 @@ export function Transaction() {
 
               <TableCell className="text-right">
                 <span className="text-sm text-gray-800 font-semibold">
-                  {`${transaction.amount > 0 ? "+" : "-"}${moneyFormatter.format(transaction.amount)}`}
+                  {`${transaction.type === TransactionType.EXPENSE ? "+" : "-"} ${moneyFormatter.format(transaction.amount)}`}
                 </span>
               </TableCell>
 
