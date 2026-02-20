@@ -5,6 +5,7 @@ import {
   ApolloLink,
   InMemoryCache,
 } from "@apollo/client";
+import { ErrorLink } from "@apollo/client/link/error";
 import { SetContextLink } from "@apollo/client/link/context";
 
 const httpLink = new HttpLink({
@@ -22,7 +23,23 @@ const authLink = new SetContextLink((prevContext) => {
   };
 });
 
+const errorLink = new ErrorLink(({ error }) => {
+  if (error) {
+    if ("errors" in error && error.errors) {
+      for (const err of error.errors) {
+        if (err.extensions?.code === "UNAUTHENTICATED") {
+          useAuthStore.getState().logout();
+        }
+      }
+    }
+
+    if ("statusCode" in error && error.statusCode === 401) {
+      useAuthStore.getState().logout();
+    }
+  }
+});
+
 export const apolloClient = new ApolloClient({
-  link: ApolloLink.from([authLink, httpLink]),
+  link: ApolloLink.from([errorLink, authLink, httpLink]),
   cache: new InMemoryCache(),
 });
